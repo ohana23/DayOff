@@ -2,7 +2,7 @@
 //  DayOffTests.swift
 //  DayOffTests
 //
-//  Created by Shimon Ohana on 8/9/18.
+//  Created by Daniel Ohana on 8/9/18.
 //  Copyright © 2018 Daniel Ohana. All rights reserved.
 //
 

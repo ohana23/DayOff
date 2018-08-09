@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  DayOff
 //
-//  Created by Shimon Ohana on 8/9/18.
+//  Created by Daniel Ohana on 8/9/18.
 //  Copyright © 2018 Daniel Ohana. All rights reserved.
 //
 
@@ -15,7 +15,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        window = UIWindow()
+        window?.makeKeyAndVisible()
+        
+        let navController = UINavigationController(rootViewController: ViewController())
+        window?.rootViewController = navController
+        
         return true
     }
 
