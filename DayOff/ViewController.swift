@@ -9,66 +9,104 @@
 
 import UIKit
 
+fileprivate let searchBarHeight = 40
+
+struct Friend {
+    let name: String
+    var isActive: Bool
+}
+
 class ViewController: UITableViewController {
     
     let cellId = "cellId123123"
-    let dayOffFriends = ["Eric", "Jane"]
-    let activeFriends = ["Mom", "Michael", "Dad"]
+    
+    /*
+     By initializing UISearchController with a nil value for the
+     searchResultsController, you tell the search controller that
+     you want use the same view you’re searching to display the
+     results. If you specify a different view controller here,
+     that will be used to display the results instead.
+    */
+    let searchController = UISearchController(searchResultsController: nil)
+
+    var allFriends = [
+        Friend(name: "Eric", isActive: false),
+        Friend(name: "Jane", isActive: false),
+        Friend(name: "Mom", isActive: true),
+        Friend(name: "Michael", isActive: true),
+        Friend(name: "Dad", isActive: true)
+    ]
+    var filteredFriends = [Friend]()
+
     
 
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         
+        // Implement navigationController
         navigationItem.title = "Friends"
         navigationController?.navigationBar.prefersLargeTitles = true
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
+        
+        // Implement searchController
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search friends"
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
     }
     
-    // View for header section
-    
-    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let label = UILabel()
-        label.backgroundColor = UIColor.white
-        label.font = UIFont.boldSystemFont(ofSize: 25)
-        
-        if section == 0 {
-            label.text = "   Taking the day off"
-        } else {
-            label.text = "   Active"
-        }
-        
-        return label
-    }
-    
-    // We'll seperate the list into 2 sections: Active and DayOff Users
+    // We'll seperate the list into 2 sections: Active users and DayOff users
     override func numberOfSections(in tableView: UITableView) -> Int {
-        
-        return 2
+        return 1
     }
     
-    // Number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        if section == 0 {
-            return dayOffFriends.count
-        } else {
-            return activeFriends.count
+        if isFiltering() {
+            return filteredFriends.count
         }
+
+        return allFriends.count
     }
     
-    // Cell for row at index path
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
+        let friend: Friend
+        if isFiltering() {
+            friend = filteredFriends[indexPath.row]
+        } else {
+            friend = allFriends[indexPath.row]
+        }
         
-        let name = indexPath.section == 0 ? dayOffFriends[indexPath.row] : activeFriends[indexPath.row]
-        cell.textLabel?.text = name
-        
+        cell.textLabel!.text = friend.name
         return cell
     }
 
+    // MARK: - Private instance methods
+    
+    func searchBarIsEmpty() -> Bool {
+        // Returns true if the text is empty or nil
+        return searchController.searchBar.text?.isEmpty ?? true
+    }
+    
+    func filterContentForSearchText(_ searchText: String, scope: String = "All") {
+        filteredFriends = allFriends.filter({( friend : Friend) -> Bool in
+            return friend.name.lowercased().contains(searchText.lowercased())
+        })
+        
+        tableView.reloadData()
+    }
+    
+    func isFiltering() -> Bool {
+        return searchController.isActive && !searchBarIsEmpty()
+    }
+}
 
+extension ViewController: UISearchResultsUpdating {
+    // MARK: - UISearchResultsUpdating Delegate
+    func updateSearchResults(for searchController: UISearchController) {
+        filterContentForSearchText(searchController.searchBar.text!)
+    }
 }
 
